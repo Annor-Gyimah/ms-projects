@@ -23,23 +23,23 @@ You can refer to the following articles on **_basics of Git and Github and also 
 - [Getting started with Git and GitHub](https://towardsdatascience.com/getting-started-with-git-and-github-6fcd0f2d4ac6)
 
 
-<h2 align=center> 📝 How to Contribute? </h2>  
+<!-- <h2 align=center> 📝 How to Contribute? </h2>  
 
 - Take a look at [Contributing Guide](https://github.com/avinashkranjan/Amazing-Python-Scripts/blob/master/CONTRIBUTING.md)
 - Take a look at the Existing Issues or create your Issues!
 - Wait for the Issue to be assigned to you after which you can start working on it.
 - Fork the Repo and create a Branch for any Issue that you are working upon.
 - Create a Pull Request which will be promptly reviewed and suggestions would be added to improve it.
-- Add Screenshots to help us know what this Script is all about.
+- Add Screenshots to help us know what this Script is all about. -->
 
 
-
+<!-- 
 <h2 align=center> 🌟 Stargazers Over Time 🌟 </h2>
 
 [![Stargazers over time](https://starchart.cc/avinashkranjan/Amazing-Python-Scripts.svg)](https://starchart.cc/avinashkranjan/Amazing-Python-Scripts)
 
 ## License
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) -->
 
 Terms and conditions for use, reproduction and distribution are under the [MIT License](https://opensource.org/license/mit/).
 
