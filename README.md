@@ -9,7 +9,7 @@ that can make Life Easier for you, as a **_Meteorologist and Data Analyst_**, an
 
 <h2 align=center> 📃 Scripts Available </h2>
   <p align="center">
-  <a href="https://github.com/avinashkranjan/Amazing-Python-Scripts/blob/master/SCRIPTS.md">
+  <a href="https://github.com/Annor-Gyimah/ms-projects/blob/master/SCRIPTS.md">
     <img src="https://forthebadge.com/images/badges/check-it-out.svg">
   </a>
 
