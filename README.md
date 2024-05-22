@@ -1,7 +1,5 @@
 
-![ms-projects](https://socialify.git.ci/Annor-Gyimah/ms-projects/image?language=1&name=1&owner=1&stargazers=1&theme=Light)
-
-
+![ms-projects](https://socialify.git.ci/Annor-Gyimah/ms-projects/image?language=1&owner=1&name=1&stargazers=1&theme=Light)
 
 <h2 align=center> 📑 Introduction </h2>
 
