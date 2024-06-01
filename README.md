@@ -3,7 +3,7 @@
 
 <h2 align=center> 📑 Introduction </h2>
 
-A curated collection of **Meteorology Mini Projects Python scripts** from **_Basics to Advance with_**. 
+A curated collection of **Meteorology Mini Projects Python scripts** from **_Basics to Advance with detailed explanations_**. 
 This is your Personal space to find or add any new script
 that can make Life Easier for you, as a **_Meteorologist and Data Analyst_**, and find a suitable scripts or project on the get go. 
 
