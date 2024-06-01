@@ -101,12 +101,11 @@ Kₖ₊₁ = Bₖ₊₁Hₖ₊₁ᵀ [Hₖ₊₁Bₖ₊₁Hₖ₊₁ᵀ + Rₖ�
 resulting in an analysis covariance matrix defined as
 ```
 Pₖ₊₁ = (Iₙ − Kₖ₊₁Hₖ₊₁)Bₖ₊₁,
-
+```
 where Iₙ is the n × n identity matrix. The resulting analysis uₐ(tₖ₊₁) is known as the best linear unbiased estimate (BLUE). 
 We highlight that information at tₖ might correspond to the analysis (i.e., ūᵇᵇ(tₖ) = uₐ(tₖ)) obtained from the last data 
 assimilation implementation, or just from the previous forecast if no other information is available. Thus, the Kalman filtering process 
 can be summarized as follows:
-```
 ```
 Inputs: ūᵇᵇ(tₖ), Bᵇₖ, Mₖ, Qₖ₊₁, w(tₖ₊₁), Rₖ₊₁, Hₖ₊₁
 
@@ -124,121 +123,89 @@ where the inputs at tₖ are defined as
 (ūᵇ(tₖ), Bₖ) otherwise.
 ```
 
-
-**Step 1: Install Dependencies**
-Before you can use the Air Pollution Prediction script, you need to make sure that you have all the necessary dependencies installed. This script requires Python 3 and the requests and matplotlib libraries. To install these dependencies, open a terminal or command prompt and run the following command:
-```
-pip install xarray matplotlib cartopy 
-```
-
-**Step 2: Set Directory Location For Data**
-After download the data from ECMWF sites, you can set the directory for the location of the data. Assuming the data is on your pendrive, you need to do something like this;
-```
-data_dir = 'D:/' # Assuming the drive letter of your pendrive is D
-```
-
-**Step 3: Plug in the Filenames**
-Next, you go to the last line of the function then you put in the filenames of the data you downloaded. Make sure they are separate files for each decade. 
-E.g.
-```
-plot_armor('1970_1979.nc','1980_1989.nc','1990_1999.nc','2000_2009.nc')
-```
-
-**Step 4: Run the Script**
-Then you run the script. It is advisable to use Jupyter Notebook. But you can also use Spyder or any application that runs python
-
-
-**Step 5: View the Results**
-After entering your city name and API key, the script will retrieve air pollution data from the World Air Quality Index API and display it in a pie chart. The chart shows the relative amounts of different pollutants in the air, such as PM2.5, PM10, NO2, SO2, and O3.
-
-You can use this information to get an idea of air pollution levels in your city and take appropriate precautions.
-
-You can experiment with different cities to see how their air pollution levels compare.
+The Kalman filter is a recursive algorithm that can be implemented in a sequential manner.
 
 <h2 align=center> 📃 Script Explanation </h2>
   <p align="center">
 
+**Step 1: Install Dependencies**
+Since this is a simple data assimilation, we wouldnt need more packages than we do. The only package we will need is numpy
 ```
-def plot_armor(dat1, dat2, dat3, dat4, cmap='gist_rainbow_r'):
+pip install numpy
 ```
-- How you normally start writing a python function. The function name is plot_armor and we are passing in dat1, dat2, dat3, dat4, and cmap as an argument for the function. Which means that the function needs these argument in order to run.
+
+**Step 2: Set the observations and the Model Data**
+The observations and the model_data below are sample air temperature data
+```
+observations = np.array([15.2,16.1,14.5,15.8,25.0])
+model_data = np.array([14.8,15.5,14.0,16.0,25.3])
+```
+
+**Step 3: Set the initial estimates**
+The next step is to set the initial estimates for the state and the uncertainty of the state. Here we set the inital state estimate to be the first value of the model data and out of our choosing, we set the initial covariance estimate to be 1
+E.g.
+```
+initial_state_estimate = model_data[0]
+initial_covariance_estimate = 1
+```
+
+**Step 4: Set the Observational and Model Uncertainty**
+The observation and model uncertainty are set to 1 and they correspond to the measurement_noise and the process_noise. Here what we are saying that maybe when the observational data was being taken, something happened and since we dont know the uncertainty, we equate it to 1. The same goes for the model
+```
+process_noise = 1
+measurement_noise = 1
 
 ```
-dat1 = xr.open_dataset(os.path.join(f,dat1))
-dat1 = dat1.groupby('time.year').mean('time').mean('year')
-dat2 = xr.open_dataset(os.path.join(f,dat2))
-dat2 = dat2.groupby('time.year').mean('time').mean('year')
-dat3 = xr.open_dataset(os.path.join(f,dat3))
-dat3 = dat3.groupby('time.year').mean('time').mean('year')
-dat4 = xr.open_dataset(os.path.join(f,dat4))
-dat4 = dat4.groupby('time.year').mean('time').mean('year')
+
+
+
+
+**Step 5: Create empty arrays and set initial values**
+The next step is to create empty arrays to store the state estimates and the covariance estimates.
 
 ```
-- Using xarray, you open the individual dataset. The **os.path.join(f,dat(number))** in the code helps join the directory and the location of the ECMWF data. The directory in this case can be a pendrive or the location where the data files are and in this case is f which has been set ahead of the function and the dat1, dat2, dat3, dat4 are the arguments passed in when defining the function which represent the filenames. 
+num_measurements = len(observations)
+
+# Arrays to store the results
+filtered_state_estimates = np.zeros(num_measurements)
+filtered_covariance_estimates = np.zeros(num_measurements)
+
+# Initial values
+filtered_state_estimates[0] = initial_state_estimate
+filtered_covariance_estimates[0] = initial_covariance_estimate
 
 ```
-dat1.groupby('time.year').mean('time').mean('year')
-``` 
-- The is used to find the mean of the whole decade by finding the mean of each year.
+
+**Step 6: Loop through the number of observations**
+The next step is to loop through the number of observations and update the state and the covariance estimates 
+and also calculate the kalman gain for each step. The steps here are 1 to 5
+
+Predicted State Estimate 
+The predicted state estimate is a forecast of the state variable before incorporating the new observation at time step 𝑘
+It is based on the previous state estimate and the system's model, and it provides a means to anticipate the state of the system using all the information available up to the previous time step.
+
+Significance: The predicted state estimate represents the expected state of the system before considering the new measurement. It is crucial for understanding how the system evolves over time based on the internal dynamics or model.
+
+Predicted Covariance Estimate 
+The predicted covariance estimate quantifies the uncertainty or confidence in the predicted state estimate. It combines the previous uncertainty with the process noise to reflect the increasing uncertainty over time due to the inherent variability in the system.
+
+Significance: The predicted covariance estimate provides a measure of how much uncertainty there is in the predicted state. A larger predicted covariance implies greater uncertainty, while a smaller one implies more confidence in the prediction. This estimate is critical for determining the Kalman gain, which balances the reliance on the predicted state versus the new observation during the update step.
 
 ```
-longitude, latitude, ds1 = dat1['longitude'], dat1['latitude'], dat1['t2m']
-ds2, ds3, ds4 = dat2['t2m'], dat3['t2m'], dat4['t2m']
+for k in range(1, num_measurements):
+    # Prediction step
+    predicted_state_estimate = filtered_state_estimates[k-1]
+    predicted_covariance_estimate = filtered_covariance_estimates[k-1] + process_noise
 
-```
-- Accessing the t2m (2 meters surface temperature data) for each decade and assigning it to a variable. We also access the longitudes and latitudes of the dataset.
-
-```
-fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(12,12) ,subplot_kw={'projection': crs.PlateCarree()})
-
-ds1_plot = ds1.plot(ax=axes[0,0], add_colorbar=False, cmap=cmap, vmax=ds1.max(), vmin=ds1.min())
-ds2_plot = ds2.plot(ax=axes[0,1], add_colorbar=False, cmap=cmap, vmax=ds2.max(), vmin=ds2.min())
-ds3_plot = ds3.plot(ax=axes[1,0], add_colorbar=False, cmap=cmap, vmax=ds3.max(), vmin=ds3.min())
-ds4_plot = ds4.plot(ax=axes[1,1], add_colorbar=False, cmap=cmap, vmax=ds4.max(), vmin=ds4.min())
-
-```
-- Create a plotting figure and axes for each decade and set up the axis coordinate for each plot. Cmap represents the color mapping used, vmax for the maximum t2m value for that decade and vmin for the minimum t2m for each decade.
-
-
-```
-title = ['Mean Temperature 1970_1979', 'Mean Temperature 1980_1989', 'Mean Temperature 1990_1999',
-'Mean Temperature 2000_2009']
-```
-- The title for each axes plot.
-
-
-```
-for ax, title in zip(axes.flatten(), title):
-    ax.set_title(title, fontsize=9)
-    ax.add_feature(feature.COASTLINE)
-    ax.add_feature(feature.BORDERS)
-    ax.add_feature(feature.STATES, linewidth=0.2)
-    ax.gridlines(draw_labels=True)
+    # Update step
+    kalman_gain = predicted_covariance_estimate / (predicted_covariance_estimate + measurement_noise)
+    filtered_state_estimates[k] = predicted_state_estimate + kalman_gain * (observations[k] - predicted_state_estimate)
+    filtered_covariance_estimates[k] = (1 - kalman_gain) * predicted_covariance_estimate
     
-cbar_kwargs = {
-    'orientation': 'horizontal',
-    'fraction': 0.03,  
-    'pad': 0.10,       
-}
-VAR = 'Mean Temp'
-```
-- Using python for loop to loop through the axes and add each title for the decade plots, add cartopy features such as coastline, borders and states. The **cbar_kwargs** represent the color bar's arguments. **VAR** equals the name for the color bar.
 
 ```
-cbar1 = plt.colorbar(ds1_plot, ax=axes[0,0], **cbar_kwargs,label= VAR,extend='both')
-cbar2 = plt.colorbar(ds2_plot, ax=axes[0,1], **cbar_kwargs,label= VAR,extend='both')
-cbar3 = plt.colorbar(ds3_plot, ax=axes[1,0], **cbar_kwargs,label= VAR,extend='both')
-cbar4 = plt.colorbar(ds4_plot, ax=axes[1,1], **cbar_kwargs,label= VAR,extend='both')
 
-
-plt.tight_layout()
-plt.savefig('POL.png')
-plt.show()
-```
-- Adding the colorbar for each plot based on the values of each decade and finally plotting the figure and saving it 
-
-```
-plot_armor('1970_1979.nc','1980_1989.nc','1990_1999.nc','2000_2009.nc')
-```
-- Run the script by calling out the function and adding the necessary arguments.
-
+Assimilated Data: The filtered_state_estimates[k] represents the best estimate of the state at time 𝑘
+k after assimilating both the model prediction and the observational data. It leverages the strength of both sources: the temporal consistency of the model and the accuracy of the observations.
+Reduced Uncertainty: Through the Kalman gain, the filter adjusts the influence of the prediction and the observation based on their uncertainties. If the model prediction is more certain (lower predicted covariance), it will have more influence. Conversely, if the observation is more certain (lower measurement noise), it will have more influence.
+Continuous Adjustment: At each time step, the filter continuously refines its state estimate, ensuring that the assimilated data reflects both the latest observation and the underlying model dynamics.
