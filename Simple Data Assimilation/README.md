@@ -128,15 +128,20 @@ The Kalman filter is a recursive algorithm that can be implemented in a sequenti
 <h2 align=center> 📃 Script Explanation </h2>
   <p align="center">
 
+**DATA ASSIMILATION**
+-----------------------------------------------------------------------------------------------------------------
 **Step 1: Install Dependencies**
-Since this is a simple data assimilation, we wouldnt need more packages than we do. The only package we will need is numpy
+Since this is a simple data assimilation, for the first part of generating the analysis field, we just need numpy. If you dont have numpy installed on your PC, you can simply copy and paste the line of code below to install it.
 ```
 pip install numpy
 ```
 
 **Step 2: Set the observations and the Model Data**
 The observations and the model_data below are sample air temperature data
+
 ```
+import numpy as np
+
 observations = np.array([15.2,16.1,14.5,15.8,25.0])
 model_data = np.array([14.8,15.5,14.0,16.0,25.3])
 ```
@@ -209,3 +214,83 @@ Assimilated Data: The filtered_state_estimates[k] represents the best estimate o
 k after assimilating both the model prediction and the observational data. It leverages the strength of both sources: the temporal consistency of the model and the accuracy of the observations.
 Reduced Uncertainty: Through the Kalman gain, the filter adjusts the influence of the prediction and the observation based on their uncertainties. If the model prediction is more certain (lower predicted covariance), it will have more influence. Conversely, if the observation is more certain (lower measurement noise), it will have more influence.
 Continuous Adjustment: At each time step, the filter continuously refines its state estimate, ensuring that the assimilated data reflects both the latest observation and the underlying model dynamics.
+
+
+**ANALYSIS AND COMPARISONS**
+----------------------------------------------------------------------------------------------------------------
+We are to compare the analysis fields, which are the best estimates (filtered state estimates) with the observations and the NWP model output and evaluate the improvement made by the data assimilation process by using statistical metrics such as RMSE and Bias.
+
+**Step1: Import packages**
+The first step is to import the necessary python packages for the statistics and the plotting packages.
+Again, if you dont have it installed on your PC, go ahead and install it but if you have them installed, just import them like the ones here below.
+```
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
+
+```
+
+**Step2: Make a dataframe out of the Observations, Model and the Assimilated (Filtered States Estimates)**
+```
+data = {
+    "Model Data": model_data,
+    "Observations": observations,
+    "Assimilated Data": filtered_state_estimates
+}
+df = pd.DataFrame(data)
+df
+
+```
+
+**Step3: Compute RMSE and BIAS**
+The next step is to calculate the root mean square error and the bias for the data. These are statistical metrics that helps us to find the performance of made by the assimilated data.
+```
+RMSE_o = mean_squared_error(df['Observations'], df['Assimilated Data'],squared=False)
+MBE_o = np.mean(df['Assimilated Data'] - df['Observations'])
+
+RMSE_m = mean_squared_error(df['Model Data'], df['Assimilated Data'],squared=False)
+MBE_m = np.mean(df['Assimilated Data'] - df['Model Data'])
+
+```
+
+**Step4: Heatmap of the statistical metrics**
+The final step is to make a visualization of the statistical metrics.
+```
+Observations_data = {
+    "Observed":["RMSE", "MBE"],
+    "Assimilated": ["RMSE", "MBE"],
+    "Values": [RMSE_o, MBE_o]
+}
+
+Modelled_data = {
+    "Modelled":["RMSE", "MBE"],
+    "Assimilated": ["RMSE", "MBE"],
+    "Values": [RMSE_m, MBE_m]
+}
+
+
+df1 = pd.DataFrame(Observations_data)
+df2 = pd.DataFrame(Modelled_data)
+
+
+fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(18,8))
+fig.subplots_adjust(wspace=0.04)
+
+sns.heatmap(df1.pivot("Observed", "Assimilated", values="Values"),annot=True,annot_kws={'fontsize':15}, ax=ax1)
+sns.heatmap(df2.pivot("Modelled", "Assimilated", values="Values"),annot=True,annot_kws={'fontsize':15}, ax=ax2)
+
+
+fig.suptitle("STATISTICAL METRICS TO QUANTIFY PERFORMANCE MADE BY THE DATA ASSIMILATION")
+
+ax1.set_title("Observation", fontweight ="bold", fontsize=15)
+ax1.tick_params(axis='both',labelsize=15)
+ax1.set_xlabel('Assimilated', fontsize=15)
+ax1.set_ylabel('Observed \n', fontsize=15)
+
+ax2.set_title("Modelled", fontweight ="bold", fontsize=15)
+ax2.tick_params(axis='both',labelsize=15)
+ax2.set_xlabel('Assimilated', fontsize=15)
+ax2.set_ylabel('Model', fontsize=15)
+
+```
