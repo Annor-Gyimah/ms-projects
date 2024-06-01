@@ -40,9 +40,89 @@ Although most application in fluid dynamics involve nonlinear systems, we first 
 standard Kalman filter developed for the linear dynamical system case with linear observation operator
 described as
 ```
-ut(t_{k}+1) = Mkut(tk) + ξ p(t_{k}+1)
-w(tk) = Hkut(tk) + ξm(tk)
+uₜ(tₖ+1) = Mₖuₜ(tₖ) + ξ p(tₖ+1)
+w(tₖ) = Hₖuₜ(tₖ) + ξm(tₖ)
 ```
+
+```
+where M ∈ ℝⁿˣⁿ is a non-singular system matrix defining the underlying governing processes and ξᵖ ∈ ℝⁿ describes the process noise (or model error). 
+H ∈ ℝᵐˣⁿ represents the measurement system with a measurement noise of ξᵐ ∈ ℝᵐ.
+
+As presented in Section 2, the true state uₜ(tₖ) is assumed to be a random variable with known mean E[uₜ(tₖ)] = ū(tₖ) 
+and covariance matrix of E[(uₜ(tₖ) − ū(tₖ))(uₜ(tₖ) − ū(tₖ))ᵀ] = Bₖ.
+
+In Kalman filtering, we note that the covariance matrix evolves in time, and thus appears the subscript. 
+We also assume that the process noise is unbiased with zero mean and a covariance matrix Q. 
+That is E(ξᵖ(tₖ)) = 0 and E(ξᵖ(tₖ)ξᵖ(tₖ)ᵀ) = Qₖ.
+
+Thus, the goal of the filtering problem is to find a good estimate (analysis) uₐ(tₖ) of the true system’s state uₜ(tₖ) 
+given a dynamical model and a set of noisy observations {w(tᵢ)} collected at some time instants tᵢ ∈ (0, tₖ]. 
+The optimality of the estimate uₐ(tₖ) is defined as the one which minimizes E[(uₜ(tₖ) − uₐ(tₖ))ᵀ(uₜ(tₖ) − uₐ(tₖ))]. 
+This filtering process generally consists of two steps: the forecast step and the data assimilation step.
+
+The forecast step is performed using the predictable part of the given dynamical model starting 
+from the best known information at time tₖ (denoted as ūᵇ(tₖ)) to produce a forecast or background 
+estimate ū(tₖ+1) = Mₖūᵇ(tₖ). 
+```
+The difference between the background forecast and true state at tₖ+1 can be written as follows,
+```
+ξᵇ(tₖ₊₁) = uₜ(tₖ₊₁) − ūᵇ(tₖ₊₁)
+           = (Mₖuₜ(tₖ) + ξᵖ(tₖ₊₁)) − Mₖūᵇ(tₖ)
+           = Mₖ(uₜ(tₖ) − ūᵇᵇ(tₖ)) + ξᵖ(tₖ₊₁)
+           = Mₖξᵇ(tₖ) + ξᵖ(tₖ₊₁),
+where ξᵇ(tₖ) = (uₜ(tₖ) − ūᵇᵇ(tₖ)) is the error estimate at tₖ, with zero mean and covariance matrix of Bᵇₖ.
+The covariance matrix of the background estimate at tₖ₊₁ can be evaluated as Bₖ₊₁ =
+E[ξᵇ(tₖ₊₁)ξᵇ(tₖ₊₁)ᵀ] = E[(Mₖξᵇ(tₖ) + ξᵖ(tₖ₊₁))(Mₖξᵇ(tₖ) + ξᵖ(tₖ₊₁))ᵀ].
+
+Since ξᵇ(tₖ) and ξᵖ(tₖ₊₁) are assumed to be uncorrelated (i.e., E[ξᵇ(tₖ)ξᵖ(tₖ₊₁)ᵀ] = 0), the background covariance matrix at tₖ₊₁ can be computed as follows:
+Bₖ₊₁ = MₖBᵇₖMₖᵀ + Qₖ₊₁.
+```
+
+```
+Now, with the forecast step, we have a background estimate at tₖ₊₁ defined as ūᵇ(tₖ₊₁) with a covariance matrix Bₖ₊₁. 
+Then, measurements w(tₖ₊₁) are collected at tₖ₊₁ with a linear operator Hₖ₊₁ and measurement noise ξᵐ(tₖ₊₁) 
+with zero mean and a covariance matrix of Rₖ₊₁. Thus, we would like to fuse these pieces of information to create an optimal 
+unbiased estimate (analysis) uₐ(tₖ₊₁) with a covariance matrix Pₖ₊₁. This can be defined as a linear function of ūᵇ(tₖ₊₁) 
+and w(tₖ₊₁) as follows,
+
+uₐ(tₖ₊₁) = ūᵇ(tₖ₊₁) + Kₖ₊₁ [w(tₖ₊₁) − Hₖ₊₁ūᵇ(tₖ₊₁)]
+```
+
+```
+where [w(tₖ₊₁) − Hₖ₊₁ūᵇ(tₖ₊₁)] is the innovation vector and K ∈ ℝⁿˣᵐ is called the Kalman gain matrix. 
+We highlight that the Kalman gain matrix is defined in such a way to minimize E[(uₜ(tₖ₊₁) − uₐ(tₖ₊₁))ᵀ(uₜ(tₖ₊₁) − uₐ(tₖ₊₁))] = tr(Pₖ₊₁).
+```
+This can be written as
+
+```
+Kₖ₊₁ = Bₖ₊₁Hₖ₊₁ᵀ [Hₖ₊₁Bₖ₊₁Hₖ₊₁ᵀ + Rₖ₊₁]⁻¹,
+
+resulting in an analysis covariance matrix defined as
+
+Pₖ₊₁ = (Iₙ − Kₖ₊₁Hₖ₊₁)Bₖ₊₁,
+
+where Iₙ is the n × n identity matrix. The resulting analysis uₐ(tₖ₊₁) is known as the best linear unbiased estimate (BLUE). 
+We highlight that information at tₖ might correspond to the analysis (i.e., ūᵇᵇ(tₖ) = uₐ(tₖ)) obtained from the last data 
+assimilation implementation, or just from the previous forecast if no other information is available. Thus, the Kalman filtering process 
+can be summarized as follows:
+
+Inputs: ūᵇᵇ(tₖ), Bᵇₖ, Mₖ, Qₖ₊₁, w(tₖ₊₁), Rₖ₊₁, Hₖ₊₁
+
+Forecast: ūᵇ(tₖ₊₁) = Mₖūᵇᵇ(tₖ)
+Bₖ₊₁ = MₖBᵇₖMₖᵀ + Qₖ₊₁
+
+Kalman gain: Kₖ₊₁ = Bₖ₊₁Hₖ₊₁ᵀ [Hₖ₊₁Bₖ₊₁Hₖ₊₁ᵀ + Rₖ₊₁]⁻¹
+
+Analysis: uₐ(tₖ₊₁) = ūᵇ(tₖ₊₁) + Kₖ₊₁ [w(tₖ₊₁) − Hₖ₊₁ūᵇ(tₖ₊₁)]
+Pₖ₊₁ = (Iₙ − Kₖ₊₁Hₖ₊₁)Bₖ₊₁,
+
+where the inputs at tₖ are defined as
+(ūᵇᵇ(tₖ), Bᵇₖ) = 
+(uₐ(tₖ), Pₖ) if w(tₖ) is available,
+(ūᵇ(tₖ), Bₖ) otherwise.
+```
+
+
 **Step 1: Install Dependencies**
 Before you can use the Air Pollution Prediction script, you need to make sure that you have all the necessary dependencies installed. This script requires Python 3 and the requests and matplotlib libraries. To install these dependencies, open a terminal or command prompt and run the following command:
 ```
