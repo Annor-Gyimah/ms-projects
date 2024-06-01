@@ -40,7 +40,7 @@ Although most application in fluid dynamics involve nonlinear systems, we first 
 standard Kalman filter developed for the linear dynamical system case with linear observation operator
 described as
 ```
-ut(t$_k$+1) = Mkut(tk) + ξ p(tk+1)
+ut(t_{k}+1) = Mkut(tk) + ξ p(t_{k}+1)
 w(tk) = Hkut(tk) + ξm(tk)
 ```
 **Step 1: Install Dependencies**
