@@ -220,7 +220,7 @@ Continuous Adjustment: At each time step, the filter continuously refines its st
 ----------------------------------------------------------------------------------------------------------------
 We are to compare the analysis fields, which are the best estimates (filtered state estimates) with the observations and the NWP model output and evaluate the improvement made by the data assimilation process by using statistical metrics such as RMSE and Bias.
 
-**Step1: Import packages**
+**Step 1: Import packages**
 The first step is to import the necessary python packages for the statistics and the plotting packages.
 Again, if you dont have it installed on your PC, go ahead and install it but if you have them installed, just import them like the ones here below.
 ```
@@ -231,7 +231,7 @@ from sklearn.metrics import mean_squared_error
 
 ```
 
-**Step2: Make a dataframe out of the Observations, Model and the Assimilated (Filtered States Estimates)**
+**Step 2: Make a dataframe out of the Observations, Model and the Assimilated (Filtered States Estimates)**
 ```
 data = {
     "Model Data": model_data,
@@ -243,7 +243,7 @@ df
 
 ```
 
-**Step3: Compute RMSE and BIAS**
+**Step 3: Compute RMSE and BIAS**
 The next step is to calculate the root mean square error and the bias for the data. These are statistical metrics that helps us to find the performance of made by the assimilated data.
 ```
 RMSE_o = mean_squared_error(df['Observations'], df['Assimilated Data'],squared=False)
@@ -254,7 +254,7 @@ MBE_m = np.mean(df['Assimilated Data'] - df['Model Data'])
 
 ```
 
-**Step4: Heatmap of the statistical metrics**
+**Step 4: Heatmap of the statistical metrics**
 The final step is to make a visualization of the statistical metrics.
 ```
 Observations_data = {
